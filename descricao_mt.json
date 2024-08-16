@@ -1,0 +1,6 @@
+{
+    "transitions": [
+        {"from": "q0", "read": "0", "to": "q1", "write": "1", "move": "R"},
+        {"from": "q1", "read": "1", "to": "q0", "write": "0", "move": "L"}
+    ]
+}
