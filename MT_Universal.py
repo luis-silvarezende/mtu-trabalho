@@ -69,6 +69,7 @@ class TuringMachine:
             symbol_read = self.read_fita3()
 
             transition = self.find_transition(state_code, symbol_read)
+            
             if transition is None:
                 return False
 
@@ -91,7 +92,6 @@ class TuringMachine:
         # Copiar cada símbolo de 'w' (após r_m_end_index) para a fita 3
         self.fita3 = self.fita1[r_m_end_index:]
 
-
     def read_fita2(self):
         return self.fita2[self.head2]
 
@@ -103,13 +103,26 @@ class TuringMachine:
         # state_code + '0' + symbol_read + ...
         encoded_transition = state_code + '0' + symbol_read
 
+        # Convertendo a fita 1 em uma string para facilitar a pesquisa
         fita1_str = ''.join(self.fita1)
-        transition_start = fita1_str.find(encoded_transition)
-        
-        if transition_start == -1:
-            return None
 
-        # Extrair a transição completa
+        # Início da pesquisa após o último '00' encontrado
+        start_position = 0
+        while True:
+            # Encontrar a próxima ocorrência da transição
+            transition_start = fita1_str.find(encoded_transition,start_position)
+        
+            if transition_start == -1:
+                return None
+            
+            # Verificar se a transição está precedida por '00'
+            if fita1_str[transition_start-2:transition_start] == '00':
+                break
+            
+            # Continuar a pesquisa a partir da próxima posição
+            start_position = transition_start + 1
+
+        # Encontrar o final da transição (até o próximo '00')
         transition_end = fita1_str.find('00', transition_start)
         if transition_end == -1:
             transition_end = len(fita1_str)
@@ -119,6 +132,7 @@ class TuringMachine:
 
     def apply_transition(self, transition):
         parts = transition.split('0')
+        print(parts)
 
         # Atualizar fita 2 com o novo estado
         self.fita2[self.head2] = parts[2]  # Novo estado
@@ -133,6 +147,8 @@ class TuringMachine:
             self.head3 += 1
             if self.head3 >= len(self.fita3):
                 self.fita3.append('B')  # Expandir fita 3 se necessário
+        
+        print(self.fita3)
 
 if __name__ == '__main__':
     input_file = 'descricao_mt.json'
